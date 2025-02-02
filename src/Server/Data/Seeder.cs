@@ -35,7 +35,7 @@ public class Seeder
             columns: new[] { nameof(Meeting.RoomId), nameof(Meeting.Status), nameof(Meeting.Type), nameof(Meeting.Title),  nameof(Meeting.StartDateTime),  nameof(Meeting.EndDateTime),},
             values: new object[,]
             {
-                { 1, MeetingStatus.Active, MeetingType.InPerson, "جلسه تحویل پروژه تست", new DateTime(year: 2025, month: 2, day: 4, hour: 10, minute:0, second: 0), new DateTime(year: 2025, month: 2, day: 4, hour: 11, minute:0, second: 0) }
+                { 1, nameof(MeetingStatus.Active), nameof(MeetingType.InPerson), "جلسه تحویل پروژه تست", new DateTime(year: 2025, month: 2, day: 4, hour: 10, minute:0, second: 0), new DateTime(year: 2025, month: 2, day: 4, hour: 11, minute:0, second: 0) }
             });
     }
 }

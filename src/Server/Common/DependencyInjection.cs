@@ -2,8 +2,6 @@
 using Server.Data;
 using Server.Modules.Meeting.Repositories.Contracts;
 using Server.Modules.Meeting.Repositories.Implementations;
-using Server.Modules.User.Repositories.Contracts;
-using Server.Modules.User.Repositories.Implementations;
 
 namespace Server.Common;
 
@@ -19,6 +17,5 @@ public static class DependencyInjection
     {
         builder.Services.AddScoped<IMeetingRepository, MeetingRepository>();
         builder.Services.AddScoped<IMeetingMemberRepository, MeetingMemberRepository>();
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
     }
 }
