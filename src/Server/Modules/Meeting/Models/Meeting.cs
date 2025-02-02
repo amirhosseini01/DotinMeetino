@@ -17,13 +17,15 @@ public class Meeting: BaseEntity
     
     [DisplayName("meeting ends at")]
     public required DateTimeOffset EndDateTime { get; set; }
-
-    [DisplayName("room number or skype-url")]
+    
+    public int? RoomId { get; set; }
+    
+    [DisplayName("url skype-url/ google-meet")]
     [StringLength(DatabaseHelper.TitlesStandardLength)]
-    public string? Room { get; set; }
+    public string? MeetingUrl { get; set; }
 
     [StringLength(DatabaseHelper.DescriptionsStandardLength)]
-    public string? Summary { get; set; }
+    public string? Result { get; set; }
 
     [Column(TypeName = DatabaseHelper.Nvarchar10)] 
     public MeetingStatus Status { get; set; } = MeetingStatus.Active;
@@ -34,5 +36,6 @@ public class Meeting: BaseEntity
     [NotMapped]
     public TimeSpan ElapsedTime => StartDateTime - EndDateTime;
 
+    public virtual Room Room { get; set; }
     public virtual ICollection<MeetingMember>? Members { get; set; }
 }
