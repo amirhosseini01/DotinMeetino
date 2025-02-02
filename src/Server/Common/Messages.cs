@@ -4,6 +4,5 @@
 public static class Messages
 {
     public const string MeetingCreatedSuccessfully = "The meeting has been created successfully";
-    public const string MeetingHasOverLap = "The meeting has overlap with other meetings! plz try another times and check the list of meetings";
-    public const string RoomIsNotAvailableForMeeting = "The room is not availale for the meeting! plz check the meeting list and choose another roo.";
+    public const string MeetingHasOverLap = "The meeting has overlap with other meetings! plz try another time or room and check the meetings list";
 }

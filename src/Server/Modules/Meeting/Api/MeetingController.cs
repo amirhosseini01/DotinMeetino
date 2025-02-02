@@ -22,10 +22,7 @@ public class MeetingController(IMeetingRepository meetingRepository) : Controlle
             return BadRequest(Messages.MeetingHasOverLap);
         }
         
-        if (!await meetingRepository.IsRoomAvailable(meeting: meeting))
-        {
-            return BadRequest(Messages.RoomIsNotAvailableForMeeting);
-        }
+        //todo: check members that be unique in each meeting
         
         await meetingRepository.AddAsync(meeting);
         await meetingRepository.SaveChangesAsync();
