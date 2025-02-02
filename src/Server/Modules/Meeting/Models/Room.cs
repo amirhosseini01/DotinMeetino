@@ -8,4 +8,6 @@ public class Room: BaseEntity
 {
     [StringLength(DatabaseHelper.TitlesStandardLength)]
     public required string Title { get; set; }
+    
+    public virtual ICollection<Meeting>? Meetings { get; set; }
 }

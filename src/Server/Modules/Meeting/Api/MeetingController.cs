@@ -9,6 +9,7 @@ namespace Server.Modules.Meeting.Api;
 [Route("api/[controller]")]
 public class MeetingController(IMeetingRepository meetingRepository) : ControllerBase
 {
+    [HttpPost]
     public async Task<IActionResult> Post(Models.Meeting meeting)
     {
         if (!ModelState.IsValid)
@@ -21,7 +22,7 @@ public class MeetingController(IMeetingRepository meetingRepository) : Controlle
             return BadRequest(Messages.MeetingHasOverLap);
         }
         
-        if (await meetingRepository.IsRoomAvailable(meeting: meeting))
+        if (!await meetingRepository.IsRoomAvailable(meeting: meeting))
         {
             return BadRequest(Messages.RoomIsNotAvailableForMeeting);
         }

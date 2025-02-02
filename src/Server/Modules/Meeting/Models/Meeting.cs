@@ -36,6 +36,6 @@ public class Meeting: BaseEntity
     [NotMapped]
     public TimeSpan ElapsedTime => StartDateTime - EndDateTime;
 
-    public virtual Room Room { get; set; }
+    public virtual Room? Room { get; set; }
     public virtual ICollection<MeetingMember>? Members { get; set; }
 }
