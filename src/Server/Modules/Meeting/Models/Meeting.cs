@@ -9,6 +9,14 @@ namespace Server.Modules.Meeting.Models;
 
 public class Meeting: BaseEntity
 {
+    public int? RoomId { get; set; }
+    
+    [Column(TypeName = DatabaseHelper.Nvarchar10)] 
+    public MeetingStatus Status { get; set; } = MeetingStatus.Active;
+    
+    [Column(TypeName = DatabaseHelper.Nvarchar10)] 
+    public MeetingType Type { get; set; } = MeetingType.InPerson;
+    
     [StringLength(DatabaseHelper.TitlesStandardLength)]
     public required string Title { get; set; }
 
@@ -18,20 +26,12 @@ public class Meeting: BaseEntity
     [DisplayName("meeting ends at")]
     public required DateTimeOffset EndDateTime { get; set; }
     
-    public int? RoomId { get; set; }
-    
     [DisplayName("url skype-url/ google-meet")]
     [StringLength(DatabaseHelper.TitlesStandardLength)]
     public string? MeetingUrl { get; set; }
 
     [StringLength(DatabaseHelper.DescriptionsStandardLength)]
     public string? Result { get; set; }
-
-    [Column(TypeName = DatabaseHelper.Nvarchar10)] 
-    public MeetingStatus Status { get; set; } = MeetingStatus.Active;
-    
-    [Column(TypeName = DatabaseHelper.Nvarchar10)] 
-    public MeetingType Type { get; set; } = MeetingType.InPerson;
     
     [NotMapped]
     public TimeSpan ElapsedTime => StartDateTime - EndDateTime;
