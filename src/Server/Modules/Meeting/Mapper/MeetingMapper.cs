@@ -9,7 +9,6 @@ public partial class MeetingMapper
 {
     public partial Models.Meeting InputToEntity(MeetingInputDto input);
     public partial void InputToEntity(MeetingInputDto input, Models.Meeting entity);
-    public partial MeetingInputDto InputToIntelligenceInput(MeetingIntelligenceInputDto input);
 }
 
 public static class MeetingMapperQuery

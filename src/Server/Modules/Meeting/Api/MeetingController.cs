@@ -62,7 +62,7 @@ public class MeetingController(
         return await meetingRepo.GetList();
     }
 
-    [HttpPost]
+    [HttpPost(nameof(IntelligenceAdd))]
     public async Task<ActionResult<Models.Meeting>> IntelligenceAdd(MeetingIntelligenceInputDto input, CancellationToken ct = default)
     {
         if (!ModelState.IsValid)

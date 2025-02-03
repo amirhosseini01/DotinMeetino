@@ -27,9 +27,9 @@ public static class MeetingServices
         }).ToList();
 
         var overlapValidation = await meetingRepo.ValidateOverlapValidation(memberRepo: memberRepo, input: input, meeting: meeting, ct: ct);
-        if (overlapValidation)
+        if (!overlapValidation)
         {
-            return new BadRequestObjectResult(validateInputRes);
+            return new BadRequestObjectResult(overlapValidation);
         }
 
         await meetingRepo.AddAsync(meeting, ct);
@@ -45,8 +45,17 @@ public static class MeetingServices
             return new BadRequestObjectResult(ResponseBase.Failed<Models.Meeting>(Messages.NoSuitableTimeFindInTheNextWeek));
         }
         
-        var mapper = new MeetingMapper();
-        var newInput = mapper.InputToIntelligenceInput(input);
+        var newInput = new MeetingInputDto
+        {
+            Title = input.Title,
+            StartDateTime = candidateStart.Value,
+            EndDateTime = candidateStart.Value.AddMinutes(input.ElapsedMinute),
+            RoomId = input.RoomId,
+            MeetingMembers = input.MeetingMembers,
+            Status = input.Status,
+            Type = input.Type,
+            MeetingUrl = input.MeetingUrl,
+        };
         
         var validateInputRes = newInput.ValidateInput();
         if (!validateInputRes)
@@ -54,6 +63,7 @@ public static class MeetingServices
             return new BadRequestObjectResult(validateInputRes);
         }
         
+        var mapper = new MeetingMapper();
         var meeting = mapper.InputToEntity(newInput);
         meeting.Members = input.MeetingMembers!.Select(x => new MeetingMember
         {
@@ -61,9 +71,9 @@ public static class MeetingServices
         }).ToList();
 
         var overlapValidation = await meetingRepo.ValidateOverlapValidation(memberRepo: memberRepo, input: newInput, meeting: meeting, ct: ct);
-        if (overlapValidation)
+        if (!overlapValidation)
         {
-            return new BadRequestObjectResult(validateInputRes);
+            return new BadRequestObjectResult(overlapValidation);
         }
 
         await meetingRepo.AddAsync(meeting, ct);
@@ -85,18 +95,23 @@ public static class MeetingServices
             return new NotFoundObjectResult(Messages.NotFount);
         }
 
+        var checkOverlap = input.StartDateTime != meeting.StartDateTime;
+
         new MeetingMapper().InputToEntity(input, meeting);
         meeting.Members = input.MeetingMembers!.Select(x => new MeetingMember
         {
             UserId = x
         }).ToList();
 
-        var overlapValidation = await meetingRepo.ValidateOverlapValidation(memberRepo: memberRepo, input: input, meeting: meeting, ct: ct);
-        if (overlapValidation)
+        if (checkOverlap)
         {
-            return new BadRequestObjectResult(overlapValidation);
+            var overlapValidation = await meetingRepo.ValidateOverlapValidation(memberRepo: memberRepo, input: input, meeting: meeting, ct: ct);
+            if (overlapValidation)
+            {
+                return new BadRequestObjectResult(overlapValidation);
+            }
         }
-
+        
         await memberRepo.DeleteMembers(route.MeetingId);
         await meetingRepo.SaveChangesAsync(ct);
 
@@ -177,13 +192,10 @@ public static class MeetingServices
 
         if (membersWithOverlap.Count > 0)
         {
-            var sbError = new StringBuilder();
-            foreach (var member in membersWithOverlap)
-            {
-                sbError.AppendLine($"{member.User!.FullName}: is not available for this meeting! plz try another person or time for meeting");
-            }
+            // var sbError = new StringBuilder();
+            var sbError = membersWithOverlap.Select(member => $"{member.User!.FullName}: is not available for this meeting! plz try another person or time for meeting").ToList();
 
-            return ResponseBase.Failed<Models.Meeting>(sbError.ToString());
+            return ResponseBase.Failed<Models.Meeting>(sbError);
         }
 
         return ResponseBase.Success<Models.Meeting>();
@@ -194,7 +206,7 @@ public static class MeetingServices
         var meetings = await meetingRepo.GetList(filter: new MeetingFilterDto
         {
             StatusArr = [MeetingStatus.Active],
-            StartDateTime = DateTimeOffset.UtcNow,
+            StartDateTime = DateTimeOffset.UtcNow.AddDays(-1),
             EndDateTime = DateTimeOffset.UtcNow.AddDays(7), // until next week from now
         }, ct: ct);
 
@@ -205,7 +217,7 @@ public static class MeetingServices
         
         foreach (var item in meetings)
         {
-            var candidateStart  = item.EndDateTime;
+            var candidateStart  = item.EndDateTime.AddMinutes(5);
             var candidateEnd  = item.EndDateTime.AddMinutes(input.ElapsedMinute);
             var overlaps = meetings.Any(x =>
                 candidateStart < x.EndDateTime &&
