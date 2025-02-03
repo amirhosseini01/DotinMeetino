@@ -28,9 +28,30 @@ public class MeetingRepository(DataBaseContext context) : GenericRepository<Mode
     }
 
 
-    public async Task<List<MeetingListDto>> GetList(CancellationToken ct = default)
+    public async Task<List<MeetingListDto>> GetList(MeetingFilterDto? filter = null, CancellationToken ct = default)
     {
         // todo: implement pagination
-        return await _store.SelectList().ToListAsync(ct);
+        var query = _store.AsNoTracking();
+        if (filter is null)
+        {
+            return await query.SelectList().ToListAsync(ct); 
+        }
+
+        if (filter.StartDateTime is not null)
+        {
+            query = query.Where(x => x.StartDateTime >= filter.StartDateTime);
+        }
+        
+        if (filter.EndDateTime is not null)
+        {
+            query = query.Where(x => x.EndDateTime <= filter.EndDateTime);
+        }
+
+        if (filter.StatusArr?.Length > 0)
+        {
+            query = query.Where(x => filter.StatusArr.Contains(x.Status));
+        }
+        
+        return await query.SelectList().OrderBy(x=> x.StartDateTime).ToListAsync(ct);
     }
 }

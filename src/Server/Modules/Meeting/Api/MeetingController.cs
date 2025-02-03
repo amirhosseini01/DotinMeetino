@@ -61,4 +61,15 @@ public class MeetingController(
     {
         return await meetingRepo.GetList();
     }
+
+    [HttpPost]
+    public async Task<ActionResult<Models.Meeting>> IntelligenceAdd(MeetingIntelligenceInputDto input, CancellationToken ct = default)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        return await meetingRepo.Create(memberRepo: memberRepo, input: input, ct: ct);
+    }
 }

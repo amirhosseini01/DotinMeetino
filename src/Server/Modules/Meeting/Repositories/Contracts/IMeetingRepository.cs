@@ -7,5 +7,5 @@ public interface IMeetingRepository: IGenericRepository<Models.Meeting>
 {
     Task<bool> HasOverLap(Models.Meeting meeting);
     // todo: implement pagination
-    Task<List<MeetingListDto>> GetList(CancellationToken ct = default);
+    Task<List<MeetingListDto>> GetList(MeetingFilterDto? filter = null, CancellationToken ct = default);
 }

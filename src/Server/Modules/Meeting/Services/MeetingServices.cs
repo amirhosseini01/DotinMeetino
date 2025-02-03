@@ -36,6 +36,40 @@ public static class MeetingServices
         await meetingRepo.SaveChangesAsync(ct);
         return meeting;
     }
+    
+    public static async Task<ActionResult<Models.Meeting>> Create(this IMeetingRepository meetingRepo, IMeetingMemberRepository memberRepo, MeetingIntelligenceInputDto input, CancellationToken ct = default)
+    {
+        var candidateStart = await meetingRepo.SuggestBestStartDateTime(input: input, ct: ct);
+        if (candidateStart is null)
+        {
+            return new BadRequestObjectResult(ResponseBase.Failed<Models.Meeting>(Messages.NoSuitableTimeFindInTheNextWeek));
+        }
+        
+        var mapper = new MeetingMapper();
+        var newInput = mapper.InputToIntelligenceInput(input);
+        
+        var validateInputRes = newInput.ValidateInput();
+        if (!validateInputRes)
+        {
+            return new BadRequestObjectResult(validateInputRes);
+        }
+        
+        var meeting = mapper.InputToEntity(newInput);
+        meeting.Members = input.MeetingMembers!.Select(x => new MeetingMember
+        {
+            UserId = x
+        }).ToList();
+
+        var overlapValidation = await meetingRepo.ValidateOverlapValidation(memberRepo: memberRepo, input: newInput, meeting: meeting, ct: ct);
+        if (overlapValidation)
+        {
+            return new BadRequestObjectResult(validateInputRes);
+        }
+
+        await meetingRepo.AddAsync(meeting, ct);
+        await meetingRepo.SaveChangesAsync(ct);
+        return meeting;
+    }
 
     public static async Task<ActionResult<Models.Meeting>> Update(this IMeetingRepository meetingRepo, IMeetingMemberRepository memberRepo, MeetingRouteDto route, MeetingInputDto input, CancellationToken ct = default)
     {
@@ -153,5 +187,37 @@ public static class MeetingServices
         }
 
         return ResponseBase.Success<Models.Meeting>();
+    }
+
+    private static async Task<DateTimeOffset?> SuggestBestStartDateTime(this IMeetingRepository meetingRepo, MeetingIntelligenceInputDto input, CancellationToken ct = default)
+    {
+        var meetings = await meetingRepo.GetList(filter: new MeetingFilterDto
+        {
+            StatusArr = [MeetingStatus.Active],
+            StartDateTime = DateTimeOffset.UtcNow,
+            EndDateTime = DateTimeOffset.UtcNow.AddDays(7), // until next week from now
+        }, ct: ct);
+
+        if (meetings.Count == 0)
+        {
+            return DateTimeOffset.UtcNow;
+        }
+        
+        foreach (var item in meetings)
+        {
+            var candidateStart  = item.EndDateTime;
+            var candidateEnd  = item.EndDateTime.AddMinutes(input.ElapsedMinute);
+            var overlaps = meetings.Any(x =>
+                candidateStart < x.EndDateTime &&
+                candidateEnd > x.StartDateTime
+            );
+
+            if (!overlaps)
+            {
+                return candidateStart;
+            }
+        }
+
+        return null;
     }
 }
