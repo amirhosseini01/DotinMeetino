@@ -79,6 +79,8 @@ public static class MeetingServices
 
         meeting.ModifiedDate = DateTimeOffset.UtcNow;
         meeting.Status = MeetingStatus.Canceled;
+
+        await meetingRepo.SaveChangesAsync(ct);
         
         return meeting;
     }
@@ -93,6 +95,8 @@ public static class MeetingServices
 
         meeting.ModifiedDate = DateTimeOffset.UtcNow;
         meeting.Result = input.Result;
+        
+        await meetingRepo.SaveChangesAsync(ct);
         
         return meeting;
     }

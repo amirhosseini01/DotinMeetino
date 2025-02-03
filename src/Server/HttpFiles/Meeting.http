@@ -1,0 +1,33 @@
+﻿# api document is available on http://localhost:5158/scalar/v1
+
+POST http://localhost:5158/api/Meeting
+Content-Type: application/json
+
+{
+  "roomId": 1,
+  "status": "Active",
+  "type": "InPerson",
+  "title": "a interview session",
+  "startDateTime": "2025-02-03T14:30:00+03:30",
+  "endDateTime": "2025-02-03T15:30:00+03:30",
+  "meetingUrl": null,
+  "meetingMembers": [
+    1,
+    2
+  ]
+}
+
+###
+
+GET http://localhost:5158/api/Meeting/Cancel?MeetingId=15
+
+###
+
+PUT http://localhost:5158/api/Meeting/SubmitResult?MeetingId=16
+Content-Type: application/json
+
+{
+  "Result": "The session result"
+}
+
+###
