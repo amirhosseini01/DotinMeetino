@@ -7,4 +7,5 @@ namespace Server.Modules.Meeting.Repositories.Contracts;
 public interface IMeetingMemberRepository: IGenericRepository<MeetingMember> 
 {
     Task<IReadOnlyList<MeetingMember>> GetByFilter(MeetingMemberFilterDto filter, CancellationToken ct = default);
+    Task<int> DeleteMembers(int meetingId);
 }

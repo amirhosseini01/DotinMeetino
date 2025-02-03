@@ -36,4 +36,9 @@ public class MeetingMemberRepository(DataBaseContext context): GenericRepository
 
         return await query.ToListAsync(ct);
     }
+
+    public async Task<int> DeleteMembers(int meetingId)
+    {
+        return await _store.Where(x => x.MeetingId == meetingId).ExecuteDeleteAsync();
+    }
 }

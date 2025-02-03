@@ -9,4 +9,5 @@ public static class Messages
     public const string EndTimeShouldBiggerThanStart = "End time should bigger than start time";
     public const string RoomRequiredForInPersonMeeting = "Select the room for the in person meeting";
     public const string UrlRequiredForOnlineMeeting = "Url required for the online meetings";
+    public const string NotFount = "No item founded!";
 }

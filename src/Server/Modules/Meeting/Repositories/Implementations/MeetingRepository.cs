@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.Data.Repositories.Implementations;
+using Server.Modules.Meeting.Dto;
 using Server.Modules.Meeting.Enums;
+using Server.Modules.Meeting.Mapper;
 using Server.Modules.Meeting.Repositories.Contracts;
 
 namespace Server.Modules.Meeting.Repositories.Implementations;
@@ -23,5 +25,12 @@ public class MeetingRepository(DataBaseContext context) : GenericRepository<Mode
                     (meeting.StartDateTime > x.StartDateTime && meeting.StartDateTime <= x.EndDateTime) || // New meeting ends during an existing meeting
                     (meeting.StartDateTime <= x.StartDateTime && meeting.StartDateTime >= x.EndDateTime) // New meeting completely overlaps an existing meeting
             );
+    }
+
+
+    public async Task<List<MeetingListDto>> GetList(CancellationToken ct = default)
+    {
+        // todo: implement pagination
+        return await _store.SelectList().ToListAsync(ct);
     }
 }
