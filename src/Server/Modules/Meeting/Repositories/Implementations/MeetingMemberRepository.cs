@@ -21,7 +21,7 @@ public class MeetingMemberRepository(DataBaseContext context): GenericRepository
         
         if (filter.MeetingEndDateTime is not null)
         {
-            query = query.Where(x => x.Meeting!.StartDateTime >= filter.MeetingEndDateTime);
+            query = query.Where(x => x.Meeting!.EndDateTime <= filter.MeetingEndDateTime);
         }
 
         if (filter.UserIdArr?.Length > 0)

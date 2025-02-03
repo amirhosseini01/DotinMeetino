@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Hangfire;
 using Scalar.AspNetCore;
 using Server.BackgroundJob;
@@ -5,7 +7,14 @@ using Server.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+;
 
 builder.Services.AddOpenApi();
 
@@ -19,7 +28,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapScalarApiReference(); // scalar/v1
     app.MapOpenApi();
-    
+
     app.UseHangfireDashboard();
 }
 

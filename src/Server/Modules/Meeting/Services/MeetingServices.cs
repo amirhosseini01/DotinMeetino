@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Common;
 using Server.Modules.Meeting.Dto;
+using Server.Modules.Meeting.Enums;
 using Server.Modules.Meeting.Mapper;
 using Server.Modules.Meeting.Models;
 using Server.Modules.Meeting.Repositories.Contracts;
@@ -15,6 +16,21 @@ public static class MeetingServices
         if (input.MeetingMembers is null || input.MeetingMembers.Length <= 1)
         {
             return new BadRequestObjectResult(Messages.SelectMoreMember);
+        }
+
+        if (input.EndDateTime < input.StartDateTime)
+        {
+            return new BadRequestObjectResult(Messages.EndTimeShouldBiggerThanStart);
+        }
+
+        if (input.Type == MeetingType.InPerson && input.RoomId is null)
+        {
+            return new BadRequestObjectResult(Messages.RoomRequiredForInPersonMeeting);
+        }
+        
+        if (input.Type == MeetingType.Online && string.IsNullOrEmpty(input.MeetingUrl))
+        {
+            return new BadRequestObjectResult(Messages.UrlRequiredForOnlineMeeting);
         }
         
         var mapper = new MeetingMapper();

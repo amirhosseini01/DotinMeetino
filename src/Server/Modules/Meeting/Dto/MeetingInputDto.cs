@@ -8,6 +8,7 @@ namespace Server.Modules.Meeting.Dto;
 
 public class MeetingInputDto
 {
+    [Range(1, int.MaxValue)]
     public int? RoomId { get; set; }
     
     [Column(TypeName = DatabaseHelper.Nvarchar10)] 
