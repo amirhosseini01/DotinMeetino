@@ -29,6 +29,11 @@ public class MeetingMemberRepository(DataBaseContext context): GenericRepository
             query = query.Where(x => filter.UserIdArr.Contains(x.UserId));
         }
 
+        if (filter.MeetingStatus?.Length > 0)
+        {
+            query = query.Where(x => filter.MeetingStatus.Contains(x.Meeting!.Status));
+        }
+
         return await query.ToListAsync(ct);
     }
 }

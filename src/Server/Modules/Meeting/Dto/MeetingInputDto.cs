@@ -32,3 +32,17 @@ public class MeetingInputDto
 
     public int[]? MeetingMembers { get; set; }
 }
+
+public class MeetingRouteDto
+{
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int MeetingId { get; set; }
+}
+
+public class MeetingResultInputDto
+{
+    [Required]
+    [StringLength(DatabaseHelper.DescriptionsStandardLength)]
+    public required string Result { get; set; }
+}

@@ -1,4 +1,5 @@
 ﻿using Server.Modules.Meeting.Dto;
+using Server.Modules.Meeting.Enums;
 using Server.Modules.Meeting.Repositories.Contracts;
 
 namespace Server.BackgroundJob.Notification;
@@ -9,7 +10,11 @@ public class NotificationSender(IMeetingMemberRepository meetingMemberRepository
     {
         var meetingWillStartAt = DateTimeOffset.UtcNow.AddHours(2);
         
-        var members = await meetingMemberRepository.GetByFilter(filter: new MeetingMemberFilterDto { MeetingStartDateTime = meetingWillStartAt });
+        var members = await meetingMemberRepository.GetByFilter(filter: new MeetingMemberFilterDto
+        {
+            MeetingStartDateTime = meetingWillStartAt,
+            MeetingStatus = [MeetingStatus.Active]
+        });
         if (!members.Any())
         {
             return;

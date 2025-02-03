@@ -2,7 +2,7 @@
 
 namespace Server.Data.Models;
 
-public class BaseEntity
+public class BaseEntity: AuditableEntity
 {
     [Key]
     public virtual int Id { get; set; }

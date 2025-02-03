@@ -49,8 +49,8 @@ public static class MeetingServices
         {
             MeetingStartDateTime = input.StartDateTime,
             MeetingEndDateTime = input.EndDateTime,
-            UserIdArr = input.MeetingMembers
-
+            UserIdArr = input.MeetingMembers,
+            MeetingStatus = [MeetingStatus.Active]
         }, ct);
         
         if (membersWithOverlap.Count > 0)
@@ -66,6 +66,34 @@ public static class MeetingServices
         
         await meetingRepo.AddAsync(meeting, ct);
         await meetingRepo.SaveChangesAsync(ct);
+        return meeting;
+    }
+    
+    public static async Task<ActionResult<Models.Meeting>> Cancel(this IMeetingRepository meetingRepo, MeetingRouteDto route, CancellationToken ct = default)
+    {
+        var meeting = await meetingRepo.FindAsync(route.MeetingId, ct);
+        if (meeting is null)
+        {
+            return new NotFoundResult();
+        }
+
+        meeting.ModifiedDate = DateTimeOffset.UtcNow;
+        meeting.Status = MeetingStatus.Canceled;
+        
+        return meeting;
+    }
+    
+    public static async Task<ActionResult<Models.Meeting>> SubmitResult(this IMeetingRepository meetingRepo, MeetingRouteDto route, MeetingResultInputDto input, CancellationToken ct = default)
+    {
+        var meeting = await meetingRepo.FindAsync(route.MeetingId, ct);
+        if (meeting is null)
+        {
+            return new NotFoundResult();
+        }
+
+        meeting.ModifiedDate = DateTimeOffset.UtcNow;
+        meeting.Result = input.Result;
+        
         return meeting;
     }
 }
